@@ -1,0 +1,782 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <title>星云-空投坊</title>
+  <link rel="stylesheet" href="./layui/css/layui.css">
+</head>
+<body class="layui-layout-body" onload="getUserAddress();">
+<div class="layui-layout layui-layout-admin">
+  <div class="layui-header">
+    <div class="layui-logo">星云-空投坊</div>
+    <!-- 头部区域（可配合layui已有的水平导航） -->
+    <ul class="layui-nav layui-layout-left">
+      <li class="layui-nav-item"><a href="admin.html">用户列表</a></li>
+      <li class="layui-nav-item"><a href="member.html">会员列表</a></li>
+    </ul>
+    
+    <ul class="layui-nav layui-layout-right">
+      <li class="layui-nav-item">
+        <a href="javascript:;">
+          <img src="http://t.cn/RCzsdCq" class="layui-nav-img">
+          贤心
+        </a>
+        <dl class="layui-nav-child">
+          <dd><a href="">基本资料</a></dd>
+          <dd><a href="">安全设置</a></dd>
+        </dl>
+      </li>
+      <li class="layui-nav-item"><a href="">退了</a></li>
+    </ul>
+  </div>
+  
+  <div class="layui-side layui-bg-black">
+    <div class="layui-side-scroll">
+      <!-- 左侧导航区域（可配合layui已有的垂直导航） -->
+      <ul class="layui-nav layui-nav-tree"  lay-filter="test">
+        <li class="layui-nav-item"><a href="index.html">首页</a></li>
+        <li class="layui-nav-item">
+          <a href="#">创建代币</a>
+        </li>
+        <li class="layui-nav-item">
+            <a href="wallet.html">代币钱包</a>
+        </li>
+        <li class="layui-nav-item">
+                <a href="airdrop.html">空投工具</a>
+            </li>
+        <li class="layui-nav-item">
+            <a href="javascript:;">开发者工具</a>
+            <dl class="layui-nav-child">
+                <dd><a href="control.html">一键生成</a></dd>
+            </dl>
+        </li>
+        <li class="layui-nav-item">
+            <a href="javascript:;">集成Demo</a>
+            <dl class="layui-nav-child">
+                <dd><a href="upload.html">文件上传</a></dd>
+                <dd><a href="upload.html">Execel导出</a></dd>
+            </dl>
+        </li>
+      </ul>
+    </div>
+  </div>
+  
+  <div class="layui-body">
+    <!-- 内容主体区域 -->
+    <div style="padding: 15px;">
+        <fieldset class="layui-elem-field">
+            <legend>创建代币</legend>
+            <div class="layui-field-box">
+                <form class="layui-form" action="">
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">代币名称</label>
+                        <div class="layui-input-block">
+                        <input type="text" id="name" name="title" required  lay-verify="required" placeholder="请输入代币名称" autocomplete="off" class="layui-input">
+                        </div>
+                    </div>
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">代币简称</label>
+                        <div class="layui-input-block">
+                        <input type="password" id="sym" name="title" required lay-verify="required" placeholder="请输入代币名称" autocomplete="off" class="layui-input">
+                        </div>
+                        <!--
+                        <div class="layui-form-mid layui-word-aux">辅助文字</div>
+                        -->
+                    </div>
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">申请总量</label>
+                        <div class="layui-input-block">
+                        <input type="text" id="totalCount" name="title" required  lay-verify="required" placeholder="请输入申请总量" autocomplete="off" class="layui-input">
+                        </div>
+                    </div>
+                    <div class="layui-form-item">
+                            <label class="layui-form-label">部署地址</label>
+                            <div class="layui-input-block">
+                            <input type="text" id="deployAddress" name="title" required  lay-verify="required" placeholder="请输入部署该代币的用户地址" autocomplete="off" class="layui-input">
+                            </div>
+                        </div>
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">空投功能</label>
+                        <div class="layui-input-inline"  onclick="addAirdrop();" style="width: 60px;">
+                        <input type="checkbox" name="switch" lay-skin="switch">
+                        </div>
+                        <div class="layui-form-mid layui-word-aux">添加空投功能需要支付1NAS费用</div>
+                    </div>
+                    <div class="layui-form-item">
+                        <div class="layui-input-block">
+                        <button id="createButton" class="layui-btn" value=0 lay-submit lay-filter="formDemo" onclick="sunmit();">创建代币</button>
+                        </div>
+                    </div>
+                </form>
+                <hr>
+                <form class="layui-form" action="">
+                    <div class="layui-form-item">
+                        <div class="layui-input-block">
+                            <p id="controlText" class="layui-form-mid layui-word-aux">通过本应用，您可以一键创建基于星云NRC20协议的代币 <br>
+                            创建普通代币免费，如果您想要创建带有空投功能的代币，需要支付1NAS的费用。 </p>
+                        </div>
+                    </div>
+                    <div class="layui-form-item">
+                        <div class="layui-input-block">
+                            <button id="addToken" class="layui-btn" lay-submit lay-filter="formDemo" onclick="addToken();" style="display:none;">添加到我的钱包</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </fieldset>
+    </div>
+  </div>
+  
+  <div class="layui-footer">
+    <!-- 底部固定区域 -->
+    © layui.com - 底部固定区域
+  </div>
+</div>
+<script type="text/javascript" src="./javascript/jquery.min.js"></script>
+<script type="text/javascript" src="./layui/layui.js"></script>
+<script type="text/javascript" src="./javascript/sys_config.js"></script>
+<script src="lib/nebulas.js"></script>
+<script src="lib/nebPay.js"></script>
+<script>
+        'use strict';
+		var HttpRequest = require("nebulas").HttpRequest;
+		var Neb = require("nebulas").Neb;
+		var NebPay = require("nebpay");
+		var nebPay = new NebPay(); 
+		var Account = require("nebulas").Account;
+		var Transaction = require("nebulas").Transaction;
+		var source  = new contractSource().source;
+		var account = new Account();
+        
+        var payAddress = '';
+        var walletAddress = '';
+        
+        var intervalQuery;
+        var tokenAddress;
+        var tokenName;
+        var tokenSym;
+		
+		// 连接网络
+		var neb = new Neb();
+		var chainId = 1;
+		var netWork = "https://mainnet.nebulas.io"
+		//var chainId = 1001;
+		//var netWork = "https://testnet.nebulas.io"
+        neb.setRequest(new HttpRequest(netWork));
+        
+        function contractSource() {
+			this.sourceWithoutDrop = `'use strict';
+
+			var Allowed = function (obj) {
+				this.allowed = {};
+				this.parse(obj);
+			}
+			
+			Allowed.prototype = {
+				toString: function () {
+					return JSON.stringify(this.allowed);
+				},
+				parse: function (obj) {
+					if (typeof obj != "undefined") {
+						var data = JSON.parse(obj);
+						for (var key in data) {
+							this.allowed[key] = new BigNumber(data[key]);
+						}
+					}
+				},
+			
+				get: function (key) {
+					return this.allowed[key];
+				},
+			
+				set: function (key, value) {
+					this.allowed[key] = new BigNumber(value);
+				}
+			}
+			
+			var StandardToken = function () {
+				LocalContractStorage.defineProperties(this, {
+					_name: null,
+					_symbol: null,
+					_decimals: null,
+					_totalSupply: {
+						parse: function (value) {
+							return new BigNumber(value);
+						},
+						stringify: function (o) {
+							return o.toString(10);
+						}
+					}
+				});
+			
+				LocalContractStorage.defineMapProperties(this, {
+					"balances": {
+						parse: function (value) {
+							return new BigNumber(value);
+						},
+						stringify: function (o) {
+							return o.toString(10);
+						}
+					},
+					"allowed": {
+						parse: function (value) {
+							return new Allowed(value);
+						},
+						stringify: function (o) {
+							return o.toString();
+						}
+					}
+				});
+			};
+			
+			StandardToken.prototype = {
+				init: function (name, symbol, decimals, totalSupply) {
+					this._name = name;
+					this._symbol = symbol;
+					this._decimals = decimals || 0;
+					this._totalSupply = new BigNumber(totalSupply).mul(new BigNumber(10).pow(decimals));
+			
+					var from = Blockchain.transaction.from;
+					this.balances.set(from, this._totalSupply);
+					this.transferEvent(true, from, from, this._totalSupply);
+				},
+			
+				// Returns the name of the token
+				name: function () {
+					return this._name;
+				},
+			
+				// Returns the symbol of the token
+				symbol: function () {
+					return this._symbol;
+				},
+			
+				// Returns the number of decimals the token uses
+				decimals: function () {
+					return this._decimals;
+				},
+			
+				totalSupply: function () {
+					return this._totalSupply.toString(10);
+				},
+			
+				balanceOf: function (owner) {
+					var balance = this.balances.get(owner);
+			
+					if (balance instanceof BigNumber) {
+						return balance.toString(10);
+					} else {
+						return "0";
+					}
+				},
+			
+				transfer: function (to, value) {
+					value = new BigNumber(value);
+					if (value.lt(0)) {
+						throw new Error("invalid value.");
+					}
+			
+					var from = Blockchain.transaction.from;
+					var balance = this.balances.get(from) || new BigNumber(0);
+			
+					if (balance.lt(value)) {
+						throw new Error("transfer failed.");
+					}
+			
+					this.balances.set(from, balance.sub(value));
+					var toBalance = this.balances.get(to) || new BigNumber(0);
+					this.balances.set(to, toBalance.add(value));
+			
+					this.transferEvent(true, from, to, value);
+				},
+			
+				transferFrom: function (from, to, value) {
+					var spender = Blockchain.transaction.from;
+					var balance = this.balances.get(from) || new BigNumber(0);
+			
+					var allowed = this.allowed.get(from) || new Allowed();
+					var allowedValue = allowed.get(spender) || new BigNumber(0);
+					value = new BigNumber(value);
+			
+					if (value.gte(0) && balance.gte(value) && allowedValue.gte(value)) {
+			
+						this.balances.set(from, balance.sub(value));
+			
+						// update allowed value
+						allowed.set(spender, allowedValue.sub(value));
+						this.allowed.set(from, allowed);
+			
+						var toBalance = this.balances.get(to) || new BigNumber(0);
+						this.balances.set(to, toBalance.add(value));
+			
+						this.transferEvent(true, from, to, value);
+					} else {
+						throw new Error("transfer failed.");
+					}
+				},
+			
+				transferEvent: function (status, from, to, value) {
+					Event.Trigger(this.name(), {
+						Status: status,
+						Transfer: {
+							from: from,
+							to: to,
+							value: value
+						}
+					});
+				},
+			
+				approve: function (spender, currentValue, value) {
+					var from = Blockchain.transaction.from;
+			
+					var oldValue = this.allowance(from, spender);
+					if (oldValue != currentValue.toString()) {
+						throw new Error("current approve value mistake.");
+					}
+			
+					var balance = new BigNumber(this.balanceOf(from));
+					var value = new BigNumber(value);
+			
+					if (value.lt(0) || balance.lt(value)) {
+						throw new Error("invalid value.");
+					}
+			
+					var owned = this.allowed.get(from) || new Allowed();
+					owned.set(spender, value);
+			
+					this.allowed.set(from, owned);
+			
+					this.approveEvent(true, from, spender, value);
+				},
+			
+				approveEvent: function (status, from, spender, value) {
+					Event.Trigger(this.name(), {
+						Status: status,
+						Approve: {
+							owner: from,
+							spender: spender,
+							value: value
+						}
+					});
+				},
+			
+				allowance: function (owner, spender) {
+					var owned = this.allowed.get(owner);
+			
+					if (owned instanceof Allowed) {
+						var spender = owned.get(spender);
+						if (typeof spender != "undefined") {
+							return spender.toString(10);
+						}
+					}
+					return "0";
+				}
+			};
+			
+			module.exports = StandardToken;`;
+        this.sourceWithDrop = 
+			`'use strict';
+
+            var Allowed = function (obj) {
+                this.allowed = {};
+                this.parse(obj);
+            }
+            
+            Allowed.prototype = {
+                toString: function () {
+                    return JSON.stringify(this.allowed);
+                },
+                parse: function (obj) {
+                    if (typeof obj != "undefined") {
+                        var data = JSON.parse(obj);
+                        for (var key in data) {
+                            this.allowed[key] = new BigNumber(data[key]);
+                        }
+                    }
+                },
+            
+                get: function (key) {
+                    return this.allowed[key];
+                },
+            
+                set: function (key, value) {
+                    this.allowed[key] = new BigNumber(value);
+                }
+            }
+            
+            var StandardToken = function () {
+                LocalContractStorage.defineProperties(this, {
+                    _name: null,
+                    _symbol: null,
+                    _decimals: null,
+                    _totalSupply: {
+                        parse: function (value) {
+                            return new BigNumber(value);
+                        },
+                        stringify: function (o) {
+                            return o.toString(10);
+                        }
+                    }
+                });
+            
+                LocalContractStorage.defineMapProperties(this, {
+                    "balances": {
+                        parse: function (value) {
+                            return new BigNumber(value);
+                        },
+                        stringify: function (o) {
+                            return o.toString(10);
+                        }
+                    },
+                    "allowed": {
+                        parse: function (value) {
+                            return new Allowed(value);
+                        },
+                        stringify: function (o) {
+                            return o.toString();
+                        }
+                    }
+                });
+            };
+            
+            StandardToken.prototype = {
+                init: function (name, symbol, decimals, totalSupply) {
+                    this._name = name;
+                    this._symbol = symbol;
+                    this._decimals = decimals || 0;
+                    this._totalSupply = new BigNumber(totalSupply).mul(new BigNumber(10).pow(decimals));
+            
+                    var from = Blockchain.transaction.from;
+                    this.balances.set(from, this._totalSupply);
+                    this.transferEvent(true, from, from, this._totalSupply);
+                },
+            
+                // Returns the name of the token
+                name: function () {
+                    return this._name;
+                },
+            
+                // Returns the symbol of the token
+                symbol: function () {
+                    return this._symbol;
+                },
+            
+                // Returns the number of decimals the token uses
+                decimals: function () {
+                    return this._decimals;
+                },
+            
+                totalSupply: function () {
+                    return this._totalSupply.toString(10);
+                },
+            
+                balanceOf: function (owner) {
+                    var balance = this.balances.get(owner);
+            
+                    if (balance instanceof BigNumber) {
+                        return balance.toString(10);
+                    } else {
+                        return "0";
+                    }
+                },
+            
+                transfer: function (to, value) {
+                    value = new BigNumber(value);
+                    if (value.lt(0)) {
+                        throw new Error("invalid value.");
+                    }
+            
+                    var from = Blockchain.transaction.from;
+                    var balance = this.balances.get(from) || new BigNumber(0);
+            
+                    if (balance.lt(value)) {
+                        throw new Error("transfer failed.");
+                    }
+            
+                    this.balances.set(from, balance.sub(value));
+                    var toBalance = this.balances.get(to) || new BigNumber(0);
+                    this.balances.set(to, toBalance.add(value));
+            
+                    this.transferEvent(true, from, to, value);
+                },
+                
+                airDrop: function (addressList, value) {
+                    if (! addressList instanceof Array){
+                        throw new Error("parameter should be Array")
+                    };
+            
+                    var len = addressList.length;
+                    var value = new BigNumber(value);
+                    var airValue = value.mul(len);
+            
+                    var from = Blockchain.transaction.from;
+                    var balance = this.balances.get(from) || new BigNumber(0);
+            
+                    if (balance.lt(airValue)) {
+                        throw new Error("transfer failed.");
+                    }
+            
+                    this.balances.set(from, balance.sub(airValue));
+                    for (var address of addressList) {
+                        var toBalance = this.balances.get(address) || new BigNumber(0);
+                        this.balances.set(address, toBalance.add(value));
+                        this.transferEvent(true, from, address, value);
+                    }
+            
+                },
+            
+                transferFrom: function (from, to, value) {
+                    var spender = Blockchain.transaction.from;
+                    var balance = this.balances.get(from) || new BigNumber(0);
+            
+                    var allowed = this.allowed.get(from) || new Allowed();
+                    var allowedValue = allowed.get(spender) || new BigNumber(0);
+                    value = new BigNumber(value);
+            
+                    if (value.gte(0) && balance.gte(value) && allowedValue.gte(value)) {
+            
+                        this.balances.set(from, balance.sub(value));
+            
+                        // update allowed value
+                        allowed.set(spender, allowedValue.sub(value));
+                        this.allowed.set(from, allowed);
+            
+                        var toBalance = this.balances.get(to) || new BigNumber(0);
+                        this.balances.set(to, toBalance.add(value));
+            
+                        this.transferEvent(true, from, to, value);
+                    } else {
+                        throw new Error("transfer failed.");
+                    }
+                },
+            
+                transferEvent: function (status, from, to, value) {
+                    Event.Trigger(this.name(), {
+                        Status: status,
+                        Transfer: {
+                            from: from,
+                            to: to,
+                            value: value
+                        }
+                    });
+                },
+            
+                approve: function (spender, currentValue, value) {
+                    var from = Blockchain.transaction.from;
+            
+                    var oldValue = this.allowance(from, spender);
+                    if (oldValue != currentValue.toString()) {
+                        throw new Error("current approve value mistake.");
+                    }
+            
+                    var balance = new BigNumber(this.balanceOf(from));
+                    var value = new BigNumber(value);
+            
+                    if (value.lt(0) || balance.lt(value)) {
+                        throw new Error("invalid value.");
+                    }
+            
+                    var owned = this.allowed.get(from) || new Allowed();
+                    owned.set(spender, value);
+            
+                    this.allowed.set(from, owned);
+            
+                    this.approveEvent(true, from, spender, value);
+                },
+            
+                approveEvent: function (status, from, spender, value) {
+                    Event.Trigger(this.name(), {
+                        Status: status,
+                        Approve: {
+                            owner: from,
+                            spender: spender,
+                            value: value
+                        }
+                    });
+                },
+            
+                allowance: function (owner, spender) {
+                    var owned = this.allowed.get(owner);
+            
+                    if (owned instanceof Allowed) {
+                        var spender = owned.get(spender);
+                        if (typeof spender != "undefined") {
+                            return spender.toString(10);
+                        }
+                    }
+                    return "0";
+                }
+            };
+            
+            module.exports = StandardToken;`;
+		}
+
+        function addAirdrop() {
+            var but = document.getElementById("createButton");
+            if (but.value == 0){
+                but.value = 1;
+                but.innerText = "支付1NAS"
+            } else {
+                but.value = 0;
+                but.innerText = "创建代币"
+            }
+        }
+
+        function sunmit() {
+            var but = document.getElementById("createButton");
+            if (but.value == 0){
+                submitTransaction()
+            } else {
+                pay1NAS()
+            }
+        }
+
+        function pay1NAS (){
+			var to = payAddress;
+			var value = 1;
+			var options = {
+				listener: function (resp) {
+					intervalQuery = setInterval(function() {
+						payQuery(resp.txhash);
+					}, 5000);
+				}
+			}
+			//发送交易(发起智能合约调用)
+			nebPay.pay(to, value, options);
+			document.getElementById('controlText').innerText = "请在浏览器插件中，进行支付操作"
+        }
+
+        function payQuery() {
+            document.getElementById('controlText').innerText = "正在查询支付结果，请稍等。。。"
+            receiptTransaction(txhash).then(function(resp){
+				var respObject = resp;
+				if (respObject.status == 1){
+                    clearInterval(intervalQuery);
+                    document.getElementById("createButton").value = 0;
+                    document.getElementById("createButton").innerText = "创建代币";
+					document.getElementById('controlText').innerText = `支付成功，您可以创建代币了，支付交易哈希为：${txhash}`
+				} else if (respObject.status == 0) {
+                    clearInterval(intervalQuery);
+                    alert(`支付失败`)
+                    document.getElementById('controlText').innerText = `支付失败，请查看原因，交易哈希为：${txhash}`
+				}
+			})
+        }
+        
+        
+        // 提交合约交易
+		function submitTransaction() {
+			var name = document.getElementById('name').value.trim();
+			var symbol = document.getElementById('sym').value.trim();
+			var decimals = 18;
+			var totalSupply = document.getElementById('totalCount').value.trim();
+			if (name === "" || symbol === "" || totalSupply === "") {
+				alert('请将以上数据填写完整！')
+			} else{
+				var to = document.getElementById("deployAddress").value.trim();
+				if (to === "") {
+					alert("请输入你的个人账户地址！");
+				} else {
+                    tokenName = name;
+                    tokenSym = symbol;
+					var args = [name, symbol, decimals, totalSupply]
+					var deployArgs =  JSON.stringify(args); //参数格式为参数数组的JSON字符串, 比如'["arg"]','["arg1","arg2]'        
+					var options = {
+						listener: function (resp) {
+							intervalQuery = setInterval(function() {
+								funcIntervalQuery(resp.txhash);
+							}, 5000);
+						}
+					}
+					//发送交易(发起智能合约调用)
+					nebPay.deploy(to, source, "js", deployArgs, options)
+					document.getElementById('controlText').innerText = `正在创建代币，请稍等。。。`
+				}
+			}
+        };
+        
+        // 查询交易结果
+		function funcIntervalQuery(txhash) {
+			document.getElementById('controlText').innerText = "正在查询创建结果，请稍等。。。"
+			receiptTransaction(txhash).then(function(resp){
+				var respObject = resp;
+				if (respObject.status == 1){
+                    var con_addr = respObject.contract_address;
+                    clearInterval(intervalQuery);
+                    tokenAddress = con_addr;
+                    document.getElementById('controlText').innerText = `代币创建成功，代币地址为：${con_addr}<br><a href="wallet.html">点击将代币添加进钱包</a>`
+                    document.getElementById('addToken').style.display = 'inline';
+				} else if (respObject.status == 0) {
+					clearInterval(intervalQuery);
+                    alert(`代币创建失败`)
+                    document.getElementById('controlText').innerText = `支付失败，请查看原因，交易哈希为：${txhash}`
+				}
+			})
+        }
+
+        function addToken() {
+            var to = walletAddress;   //Dapp的合约地址
+			var value = 0;
+			var callFunction = "save";//调用的函数名称
+			var callArgs =  JSON.stringify([tokenAddress, tokenName, tokenSym]); //参数格式为参数数组的JSON字符串, 比如'["arg"]','["arg1","arg2]'        
+			var options = {
+				listener: function (resp) {
+					intervalQuery = setInterval(function() {
+						funcIntervalQuery2(resp.txhash);
+					}, 5000);
+				}
+			}
+			//发送交易(发起智能合约调用)
+			nebPay.call(to, value, callFunction, callArgs, options);
+			newWindow.innerHTML = `<h4>请再次到<em>浏览器插件</em>中完成操作...</h4>`
+        }
+
+        function funcIntervalQuery2(txhash) {
+			document.getElementById('controlText').innerText = "正在查询创建结果，请稍等。。。"
+			receiptTransaction(txhash).then(function(resp){
+				var respObject = resp;
+				if (respObject.status == 1){
+                    var con_addr = respObject.contract_address;
+                    clearInterval(intervalQuery);
+                    tokenAddress = con_addr;
+                    document.getElementById('controlText').innerText = `添加钱包成功，快去你的钱包查看吧 <a href="wallet.html">点击前往钱包</a>`
+                    document.getElementById('addToken').style.display = 'none';
+				} else if (respObject.status == 0) {
+					clearInterval(intervalQuery);
+                    alert(`添加钱包失败`)
+                    document.getElementById('controlText').innerText = `添加失败，请查看原因，交易哈希为：${txhash}`
+				}
+			})
+        }
+
+        function getUserAddress() {
+            window.postMessage(
+              {
+                target: 'contentscript',
+                method: 'getAccount'
+              },
+              '*'
+            )
+            window.addEventListener('message', function(e) {
+              if (e.data && e.data.data && e.data.data.account) {
+                console.log(e.data.data.account)
+                document.getElementById("deployAddress").value = e.data.data.account;
+              }
+            })
+          }
+        
+        var receiptTransaction = function(txhash) {
+			var promise = new Promise(function(resolve, reject){
+				neb.api.getTransactionReceipt(txhash).then(function (resp) {
+					resolve(resp);
+				}).catch(function(err) {
+					console.log(err);
+				});
+			});
+			return promise
+		}
+
+</script>
+</body>
+</html>
