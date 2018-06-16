@@ -381,6 +381,16 @@
     return promise;
   }
 
+  var receiptTransaction = function(txhash) {
+    var promise = new Promise(function(resolve, reject){
+      neb.api.getTransactionReceipt(txhash).then(function (resp) {
+        resolve(resp);
+      }).catch(function(err) {
+        console.log(err);
+      });
+    });
+    return promise
+  }
 
 </script>
 </body>
