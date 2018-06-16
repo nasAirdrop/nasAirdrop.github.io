@@ -49,7 +49,7 @@
                   </div>
                   <div class="layui-inline" style="text-align:left;">
                     <div class="layui-input-inline">
-                      <button onclick="changeAccount();">更换账户</button>
+                      <button class="layui-btn" lay-submit lay-filter="formDemo" onclick="changeAccount();">更换账户</button>
                     </div>
                   </div>
                 </div>
@@ -61,17 +61,17 @@
                   </div>
                   <div class="layui-inline" style="text-align:left;">
                     <div class="layui-input-inline">
-                        <button onclick="addToken();">添加代币</button>
+                        <button class="layui-btn" lay-submit lay-filter="formDemo" onclick="changeAccount();">添加代币</button>
                     </div>
                   </div>
                 </div>
               </form>
-              <hr>
+              <!-- <hr>
               <div class="layui-btn-group">
                   <button class="layui-btn layui-btn-xs dw-refresh" onload="location.reload();">
                       <i class="layui-icon">&#x1002;</i>刷新
                   </button>
-              </div>
+              </div> -->
               <hr>
               <table class="layui-table" id="table">
                   <colgroup>
