@@ -665,10 +665,11 @@
 							}, 5000);
 						}
 					}
-					//发送交易(发起智能合约调用)
+                    //发送交易(发起智能合约调用)
                     nebPay.deploy(to, source, "js", deployArgs, options)
                     console.log(`正在创建代币，请稍等。。。`)
 					document.getElementById('controlText').innerText = `正在创建代币，请稍等。。。`
+                    
 				}
 			}
         };
