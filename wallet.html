@@ -84,7 +84,7 @@
                       <th>代币名称</th>
                       <th>代币地址</th>
                       <th>代币余额</th>
-                      <!-- <th style="text-align:center;">操作</th> -->
+                      <th style="text-align:center;">操作</th>
                       </tr> 
                   </thead>
                   <tbody id="content">
@@ -212,6 +212,39 @@
     })
       }
 
+  function delToken(id) {
+      document.getElementById("noToken").innerText = "请到浏览器插件中完成操作"
+      var to = walletAddress;   //Dapp的合约地址
+      var value = 0;
+      var callFunction = "del";//调用的函数名称
+      var callArgs =  JSON.stringify([id]); //参数格式为参数数组的JSON字符串, 比如'["arg"]','["arg1","arg2]'        
+      var options = {
+      listener: function (resp) {
+        intervalQuery = setInterval(function() {
+          delQuery(resp.txhash);
+        }, 5000);
+      }
+      }
+      //发送交易(发起智能合约调用)
+      nebPay.call(to, value, callFunction, callArgs, options);
+  }
+
+  function delQuery(txhash) {
+    document.getElementById("noToken").innerText = "正在查询删除结果，请稍等。。。"
+    receiptTransaction(txhash).then(function(resp){
+      var respObject = resp;
+      if (respObject.status == 1){
+                  clearInterval(intervalQuery);
+                  document.getElementById("noToken").innerText = `代币删除成功`
+                  location.reload();
+      } else if (respObject.status == 0) {
+        clearInterval(intervalQuery);
+                  alert(`代币删除失败`)
+                  document.getElementById("noToken").innerText = `删除失败，请查看原因，交易哈希为：${txhash}`
+      }
+    })
+      }
+
   function getToken(accountAddress, contractAddress) {
     var promise = new Promise (function(resolve, reject) {
       var name, symbol;
@@ -262,6 +295,13 @@
               <td>${token.symbol}</td>
               <td>${token.address}</td>
               <td>${token.balance/1e18}</td>
+              <td class="text-center">
+                  <div class="layui-btn-group">
+                    <button class="layui-btn layui-btn-xs layui-btn-danger dw-delete" onclick="delToken(${token.id});">
+                      删除
+                    </button>
+                  </div>
+                </td>
             </tr>`
             /*
             var html1 = `
@@ -308,6 +348,7 @@
 
   function callToken(accountAddress, token) {
     var promise = new Promise (function(resolve, reject) {
+      var id = token.id;
       var name = token.name;
       var symbol = token.sym;
       var contractAddress = token.address;
@@ -319,6 +360,7 @@
         } else {
           balance = data;
           var dic = {
+            id: id,
             name: name, 
             symbol: symbol, 
             balance: balance, 
