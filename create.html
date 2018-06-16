@@ -682,7 +682,6 @@
                     clearInterval(intervalQuery);
                     tokenAddress = con_addr;
                     document.getElementById("createButton").value = 0;
-                    document.getElementById("createButton").innerText = "支付手续费";
                     document.getElementById('controlText').innerText = `代币创建成功，代币地址为：${con_addr}`
                     document.getElementById('addToken').style.display = 'inline';
 				} else if (respObject.status == 0) {

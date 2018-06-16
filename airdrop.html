@@ -189,7 +189,7 @@
             var to = tokenAddress;
             var value = 0;
             var callFunction = "airDrop";
-            var callArgs =  JSON.stringify([userList, userValue]);      
+            var callArgs =  JSON.stringify([userList, userValue*1e18]);      
             var options = {
                 listener: function (resp) {
                     intervalQuery = setInterval(function() {
@@ -218,6 +218,17 @@
                 document.getElementById('controlText').innerText = `空投失败，请查看原因，交易哈希为：${txhash}`
             }
         })
+    }
+
+    var receiptTransaction = function(txhash) {
+        var promise = new Promise(function(resolve, reject){
+            neb.api.getTransactionReceipt(txhash).then(function (resp) {
+                resolve(resp);
+            }).catch(function(err) {
+                console.log(err);
+            });
+        });
+        return promise
     }
         
 </script>
