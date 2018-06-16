@@ -86,7 +86,7 @@
                       <th>代币名称</th>
                       <th>代币地址</th>
                       <th>代币余额</th>
-                      <th style="text-align:center;">操作</th>
+                      <!-- <th style="text-align:center;">操作</th> -->
                       </tr> 
                   </thead>
                   <tbody id="content">
@@ -122,7 +122,7 @@
   var Transaction = require("nebulas").Transaction;
   var account = new Account();
       
-  var walletAddress = 'n21wgLzeXuBNSA1zE6haPrB3b83v1fw3NZa';
+  var walletAddress = 'n22qyB6oGfiukQy6P8MiiUNRKDDgHzZVJ8P';
   var userAccount;
   var tokenList = new Array();
   
@@ -247,6 +247,13 @@
               <td>${token.symbol}</td>
               <td>${token.address}</td>
               <td>${token.balance/1e18}</td>
+            </tr>`
+            /*
+            var html1 = `
+            <tr>
+              <td>${token.symbol}</td>
+              <td>${token.address}</td>
+              <td>${token.balance/1e18}</td>
               <td class="text-center">
                 <div class="layui-btn-group">
                   <button class="layui-btn layui-btn-xs layui-btn-normal dw-dailog" dw-url="create.html?id=1" dw-title="编辑用户">
@@ -261,6 +268,7 @@
                 </div>
               </td>
             </tr>`
+            */
             token.html = html;
             sortList.push(token)
           }

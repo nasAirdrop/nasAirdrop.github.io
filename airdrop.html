@@ -124,8 +124,8 @@
     var Transaction = require("nebulas").Transaction;
     var account = new Account();
     
-    var payAddress = 'n1FFDBHfMwY4io9FtSqcR3RL6T6FTkpN3eb';
-    var walletAddress = 'n21wgLzeXuBNSA1zE6haPrB3b83v1fw3NZa';
+    var payAddress = 'n1e1rH1K1SQQfFrqXzouxxogg4iba3gqzq7';
+    var walletAddress = 'n22qyB6oGfiukQy6P8MiiUNRKDDgHzZVJ8P';
     var intervalQuery;
     
     // 连接网络
@@ -147,7 +147,7 @@
 
     function payNAS (){
         var to = payAddress;
-        var value = 0;
+        var value = 0.01;
         var options = {
             listener: function (resp) {
                 intervalQuery = setInterval(function() {
