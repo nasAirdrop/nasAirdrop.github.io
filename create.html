@@ -616,7 +616,7 @@
 			document.getElementById('controlText').innerText = "请在浏览器插件中，进行支付操作"
         }
 
-        function payQuery() {
+        function payQuery(txhash) {
             document.getElementById('controlText').innerText = "正在查询支付结果，请稍等。。。"
             receiptTransaction(txhash).then(function(resp){
 				var respObject = resp;
