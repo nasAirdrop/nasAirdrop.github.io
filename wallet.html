@@ -8,7 +8,7 @@
   <link rel="stylesheet" href="./css/global.css">
   <link rel="stylesheet" href="./icheck/minimal/red.css">
 </head>
-<body class="layui-layout-body">
+<body class="layui-layout-body" onload="loadTokens();">
 <div class="layui-layout layui-layout-admin">
   <div class="layui-header">
     <div class="layui-logo">星云-空投坊</div>
@@ -93,12 +93,12 @@
                       <i class="layui-icon">&#xe640;</i>删除
                   </button>
                   -->
-                  <button class="layui-btn layui-btn-xs dw-refresh">
+                  <button class="layui-btn layui-btn-xs dw-refresh" onload="location.reload();">
                       <i class="layui-icon">&#x1002;</i>刷新
                   </button>
               </div>
               <hr>
-              <table class="layui-table">
+              <table class="layui-table" id="table">
                   <colgroup>
                       <col width="150">
                       <col width="150">
@@ -115,28 +115,13 @@
                       <th style="text-align:center;">操作</th>
                       </tr> 
                   </thead>
-                  <tbody>
-                      <tr>
-                      <td>SHE</td>
-                      <td>n1Y52wL9MHJruaRhkQMMz1acvLMrwYZZrmT</td>
-                      <td>n1Y52wL9MHJruaRhkQMMz1acvLMrwYZZrmT</td>
-                      <td class="text-center">
-                        <div class="layui-btn-group">
-                          <button class="layui-btn layui-btn-xs layui-btn-normal dw-dailog" dw-url="create.html?id=1" dw-title="编辑用户">
-                            转账
-                          </button>
-                          <button class="layui-btn layui-btn-xs layui-btn-danger dw-delete" dw-url="delete.html?id=1" dw-title="小明">
-                            删除
-                          </button>
-                          <button class="layui-btn layui-btn-xs dw-refresh">
-                              <i class="layui-icon"></i>空投
-                          </button>
-                        </div>
-                      </td>
-                      </tr>
-                      <tr>
+                  <tbody id="content">
                   </tbody>
               </table>
+              <hr>
+              <div id="noToken" style="text-align: center; display:none">
+                <p>您的钱包里还没有代币，赶快添加吧！</p>
+              </div>
             </div>
         </fieldset>
     </div>
@@ -151,5 +136,160 @@
 <script type="text/javascript" src="./layui/layui.js"></script>
 <script type="text/javascript" src="./icheck/icheck.js"></script>
 <script type="text/javascript" src="./javascript/dw.js"></script>
+<script src="lib/nebulas.js"></script>
+<script src="lib/nebPay.js"></script>
+<script>
+  'use strict';
+  var HttpRequest = require("nebulas").HttpRequest;
+  var Neb = require("nebulas").Neb;
+  var NebPay = require("nebpay");
+  var nebPay = new NebPay(); 
+  var Account = require("nebulas").Account;
+  var Transaction = require("nebulas").Transaction;
+  var account = new Account();
+      
+  var walletAddress = 'n222oUdCCy4DtKXBnwUdKVKvqEzBqetn5q6';
+  
+  // 连接网络
+  var neb = new Neb();
+  var chainId = 1;
+  var netWork = "https://mainnet.nebulas.io"
+  //var chainId = 1001;
+  //var netWork = "https://testnet.nebulas.io"
+  neb.setRequest(new HttpRequest(netWork));
+
+  function loadTokens() {
+    var user = getUserAddress();
+    console.log(user)
+    searchToken(user);
+  }
+
+  function searchToken(accountAddress) {
+    callContract(accountAddress, accountAddress,"search", [accountAddress]).then(function(tokens){
+      //var tokenHtml = "";
+      //var tokenList = new Array();
+      //var tokenContent = document.getElementById('tokenList');
+      var sortList = new Array();
+      var contentList = new Array();
+      for (var i=0; i< tokens.length; i++){
+        var token = tokens[i]
+        contentList.push(callToken(accountAddress, token))
+      }
+      Promise.all(contentList).then(function(data){
+        for (var i=0; i< data.length; i++){
+          var token = data[i];
+          if (token === null) {
+            console.log('存在一个非法地址！')
+          } else {
+            var html = `
+            <tr>
+              <td>${token.sym}</td>
+              <td>${token.address}</td>
+              <td>${token.balance/1e18}</td>
+              <td class="text-center">
+                <div class="layui-btn-group">
+                  <button class="layui-btn layui-btn-xs layui-btn-normal dw-dailog" dw-url="create.html?id=1" dw-title="编辑用户">
+                    转账
+                  </button>
+                  <button class="layui-btn layui-btn-xs layui-btn-danger dw-delete" dw-url="delete.html?id=1" dw-title="小明">
+                    删除
+                  </button>
+                  <button class="layui-btn layui-btn-xs dw-refresh">
+                      <i class="layui-icon"></i>空投
+                  </button>
+                </div>
+              </td>
+            </tr>`
+            token.html = html;
+            sortList.push(token)
+          }
+        }
+      }).catch(function(err) {
+        console.log(err);
+      });
+
+      liList.sort(function(li1, li2){
+        var n1=parseInt(li1.balance);  
+        var n2=parseInt(li2.balance);  
+        return n2-n1;  //升序排列  
+      });
+
+      document.getElementById("content").innerHTML = ""
+      for(var i=0;i<liList.length;i++){  
+          document.getElementById("content").insertAdjacentHTML('beforeend', liList[i].html);
+      }
+
+    });
+  }
+
+  function callToken(accountAddress, token) {
+    var promise = new Promise (function(resolve, reject) {
+      var name = token.name;
+      var symbol = token.sym;
+      var contractAddress = token.address;
+      var balance;
+      callContract(accountAddress, contractAddress, "balanceOf", [accountAddress]).then(function(data) {
+        balance = data;
+        var dic = {
+          name: name, 
+          symbol: symbol, 
+          balance: balance, 
+          address: contractAddress
+        };
+        resolve(dic)
+      });
+    });
+    return promise;
+  }
+
+  function callContract(accountAddress, contractAddress, func, args) {
+    var promise = new Promise (function(resolve, reject) {
+      neb.api.call({
+        chainID: chainId,
+        from: accountAddress,
+        to: contractAddress,
+        value: 0,
+        nonce: 0,
+        gasPrice: 1000000,
+        gasLimit: 2000000,
+        contract: {
+          function: func,
+          args: JSON.stringify(args),
+        }
+      }).then(function (resp) {
+        var data = JSON.parse(resp.result);
+        resolve(data)
+      }).catch(function(err) {
+        console.log(err);
+        if (err == "Error: invalid contract"){
+          resolve(null);
+        } else{
+          alert("您的钱包里还没有代币，赶快添加吧！");
+          document.getElementById("table").style.display = "none";
+          document.getElementById("noToken").style.display = "inline";
+        }
+      })
+    });
+    return promise;
+  };
+
+  function getUserAddress() {
+    window.postMessage(
+      {
+        target: 'contentscript',
+        method: 'getAccount'
+      },
+      '*'
+    )
+    window.addEventListener('message', function(e) {
+      if (e.data && e.data.data && e.data.data.account) {
+        console.log(e.data.data.account)
+        return e.data.data.account;
+      }
+    })
+  }
+
+
+</script>
 </body>
 </html>
