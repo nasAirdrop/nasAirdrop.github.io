@@ -493,8 +493,8 @@ layui.define('layer', function(exports){
     });
 
     //表单提交事件
-    dom.on('submit', ELEM, submit)
-        .on('click', '*[lay-submit]', submit);
+    // dom.on('submit', ELEM, submit)
+    //     .on('click', '*[lay-submit]', submit);
 
     exports(MOD_NAME, form);
 });
