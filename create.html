@@ -115,7 +115,7 @@
 		var nebPay = new NebPay(); 
 		var Account = require("nebulas").Account;
 		var Transaction = require("nebulas").Transaction;
-		var source  = new contractSource().source;
+		var source;
 		var account = new Account();
         
         var payAddress = 'n1FFDBHfMwY4io9FtSqcR3RL6T6FTkpN3eb';
@@ -125,6 +125,7 @@
         var tokenAddress;
         var tokenName;
         var tokenSym;
+        var payed = 0;
 		
 		// 连接网络
 		var neb = new Neb();
@@ -595,7 +596,7 @@
         function sunmit() {
             var but = document.getElementById("createButton");
             if (but.value == 0){
-                submitTransaction()
+                submitTransaction(payed)
             } else {
                 pay1NAS()
             }
@@ -622,6 +623,7 @@
 				var respObject = resp;
 				if (respObject.status == 1){
                     clearInterval(intervalQuery);
+                    payed = 1;
                     document.getElementById("createButton").value = 0;
                     document.getElementById("createButton").innerText = "创建代币";
 					document.getElementById('controlText').innerText = `支付成功，您可以创建代币了，支付交易哈希为：${txhash}`
@@ -635,7 +637,12 @@
         
         
         // 提交合约交易
-		function submitTransaction() {
+		function submitTransaction(v) {
+            if(v == 0){
+                source = new contractSource().sourceWithoutDrop;
+            } else {
+                source = new contractSource().sourceWithDrop;
+            }
 			var name = document.getElementById('name').value.trim();
 			var symbol = document.getElementById('sym').value.trim();
 			var decimals = 18;
@@ -674,7 +681,7 @@
                     var con_addr = respObject.contract_address;
                     clearInterval(intervalQuery);
                     tokenAddress = con_addr;
-                    document.getElementById('controlText').innerText = `代币创建成功，代币地址为：${con_addr}<br><a href="wallet.html">点击将代币添加进钱包</a>`
+                    document.getElementById('controlText').innerText = `代币创建成功，代币地址为：${con_addr}`
                     document.getElementById('addToken').style.display = 'inline';
 				} else if (respObject.status == 0) {
 					clearInterval(intervalQuery);
