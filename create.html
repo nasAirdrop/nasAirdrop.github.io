@@ -41,13 +41,13 @@
                     <div class="layui-form-item">
                         <label class="layui-form-label">代币名称</label>
                         <div class="layui-input-block">
-                        <input type="text" id="name" name="title" required  lay-verify="required" placeholder="请输入代币名称" autocomplete="off" class="layui-input">
+                        <input type="text" id="name" name="name" required  lay-verify="required" placeholder="请输入代币名称" autocomplete="off" class="layui-input">
                         </div>
                     </div>
                     <div class="layui-form-item">
                         <label class="layui-form-label">代币简称</label>
                         <div class="layui-input-block">
-                        <input type="text" id="sym" name="title" required lay-verify="required" placeholder="请输入代币名称" autocomplete="off" class="layui-input">
+                        <input type="text" id="sym" name="symbol" required lay-verify="required" placeholder="请输入代币名称" autocomplete="off" class="layui-input">
                         </div>
                         <!--
                         <div class="layui-form-mid layui-word-aux">辅助文字</div>
@@ -56,18 +56,18 @@
                     <div class="layui-form-item">
                         <label class="layui-form-label">申请总量</label>
                         <div class="layui-input-block">
-                        <input type="text" id="totalCount" name="title" required  lay-verify="required" placeholder="请输入申请总量" autocomplete="off" class="layui-input">
+                        <input type="text" id="totalCount" name="total" required  lay-verify="required" placeholder="请输入申请总量" autocomplete="off" class="layui-input">
                         </div>
                     </div>
                     <div class="layui-form-item">
                             <label class="layui-form-label">部署地址</label>
                             <div class="layui-input-block">
-                            <input type="text" id="deployAddress" name="title" required  lay-verify="required" placeholder="请输入部署该代币的用户地址" autocomplete="off" class="layui-input">
+                            <input type="text" id="deployAddress" name="address" required  lay-verify="required" placeholder="请输入部署该代币的用户地址" autocomplete="off" class="layui-input">
                             </div>
                         </div>
                     <div class="layui-form-item">
                         <label class="layui-form-label">空投功能</label>
-                        <div class="layui-input-inline"  onclick="addAirdrop();" style="width: 60px;">
+                        <div id="isAir" class="layui-input-inline"  onclick="addAirdrop();" style="width: 60px;">
                         <input type="checkbox" name="switch" lay-skin="switch">
                         </div>
                         <div class="layui-form-mid layui-word-aux">添加空投功能需要支付1NAS费用</div>
@@ -99,8 +99,7 @@
   
   <div class="layui-footer">
     <!-- 底部固定区域 -->
-    © layui.com - 底部固定区域
-  </div>
+    © 星云-空投坊由星云链提供区块链服务.
 </div>
 <script type="text/javascript" src="./javascript/jquery.min.js"></script>
 <script type="text/javascript" src="./layui/layui.js"></script>
@@ -681,7 +680,7 @@
                     var con_addr = respObject.contract_address;
                     clearInterval(intervalQuery);
                     tokenAddress = con_addr;
-                    document.getElementById("createButton").value = 0;
+                    document.getElementById("isAir").click();
                     document.getElementById('controlText').innerText = `代币创建成功，代币地址为：${con_addr}`
                     document.getElementById('addToken').style.display = 'inline';
 				} else if (respObject.status == 0) {
