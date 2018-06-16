@@ -682,7 +682,7 @@
                     var con_addr = respObject.contract_address;
                     clearInterval(intervalQuery);
                     tokenAddress = con_addr;
-                    //document.getElementById("isAir").click();
+                    document.getElementById("isAir").click();
                     document.getElementById('controlText').innerText = `代币创建成功，代币地址为：${con_addr}`
                     document.getElementById('addToken').style.display = 'inline';
 				} else if (respObject.status == 0) {
