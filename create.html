@@ -88,7 +88,7 @@
                     </div>
                     <div class="layui-form-item">
                         <div class="layui-input-block">
-                            <button id="addToken" class="layui-btn" lay-submit lay-filter="formDemo" onclick="addToken();" style="display:none;">添加到我的钱包</button>
+                            <button id="addToken" class="layui-btn" lay-submit lay-filter="formDemo" onclick="addTokenFun();" style="display:inline;">添加到我的钱包</button>
                         </div>
                     </div>
                 </form>
@@ -691,7 +691,7 @@
 			})
         }
 
-        function addToken() {
+        function addTokenFun() {
             var to = walletAddress;   //Dapp的合约地址
 			var value = 0;
 			var callFunction = "save";//调用的函数名称
@@ -705,7 +705,7 @@
 			}
 			//发送交易(发起智能合约调用)
 			nebPay.call(to, value, callFunction, callArgs, options);
-			document.getElementById('controlText').innerText = `请在添加代币，请稍等。。。</h4>`
+			document.getElementById('controlText').innerText = `请在添加代币，请稍等。。。`
         }
 
         function funcIntervalQuery2(txhash) {
