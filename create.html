@@ -623,7 +623,7 @@
 				if (respObject.status == 1){
                     clearInterval(intervalQuery);
                     payed = 1;
-                    document.getElementById("createButton").value = 0;
+                    document.getElementById("createButton").value = 1;
                     document.getElementById("createButton").innerText = "创建代币";
 					document.getElementById('controlText').innerText = `支付成功，您可以创建代币了，支付交易哈希为：${txhash}`
 				} else if (respObject.status == 0) {
@@ -682,7 +682,9 @@
                     var con_addr = respObject.contract_address;
                     clearInterval(intervalQuery);
                     tokenAddress = con_addr;
-                    document.getElementById("isAir").click();
+                    if (document.getElementById("createButton").value == 1){
+                        document.getElementById("isAir").click();
+                    }
                     document.getElementById('controlText').innerText = `代币创建成功，代币地址为：${con_addr}`
                     document.getElementById('addToken').style.display = 'inline';
 				} else if (respObject.status == 0) {
