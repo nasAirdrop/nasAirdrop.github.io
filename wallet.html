@@ -163,10 +163,12 @@
   neb.setRequest(new HttpRequest(netWork));
 
   function loadTokens() {
-    var user = getUserAddress();
-    document.getElementById("account").value = user;
-    console.log(user)
-    searchToken(user);
+    getUserAddress().then(function(user){
+      document.getElementById("account").value = user;
+      console.log(user)
+      searchToken(user);
+    });
+    
   }
 
   function searchToken(accountAddress) {
@@ -277,19 +279,22 @@
   };
 
   function getUserAddress() {
-    window.postMessage(
-      {
-        target: 'contentscript',
-        method: 'getAccount'
-      },
-      '*'
-    )
-    window.addEventListener('message', function(e) {
-      if (e.data && e.data.data && e.data.data.account) {
-        console.log(e.data.data.account)
-        return e.data.data.account;
-      }
-    })
+    var promise = new Promise (function(resolve, reject) {
+      window.postMessage(
+        {
+          target: 'contentscript',
+          method: 'getAccount'
+        },
+        '*'
+      )
+      window.addEventListener('message', function(e) {
+        if (e.data && e.data.data && e.data.data.account) {
+          console.log(e.data.data.account)
+          resolve(e.data.data.account);
+        }
+      })
+    });
+    return promise;
   }
 
 
