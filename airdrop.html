@@ -39,7 +39,7 @@
             <div class="layui-field-box">
                 <hr>
                 <form class="layui-form" action="">
-                    <div class="layui-form-item">
+                    <!-- <div class="layui-form-item">
                         <label class="layui-form-label">选择代币</label>
                         <div class="layui-input-block">
                         <select name="city" lay-verify="required">
@@ -51,7 +51,7 @@
                             <option value="4">杭州</option>
                         </select>
                         </div>
-                    </div>
+                    </div> -->
                     <hr>
                     <div class="layui-form-item">
                         <label class="layui-form-label">代币简称</label>
@@ -62,33 +62,40 @@
                     <div class="layui-form-item">
                         <label class="layui-form-label">代币地址</label>
                         <div class="layui-input-block">
-                        <input type="password" name="password" required lay-verify="required" placeholder="请输入代币地址" autocomplete="off" class="layui-input">
+                        <input type="text" id="token" name="text" required lay-verify="required" placeholder="请输入代币地址" autocomplete="off" class="layui-input">
                         </div>
                     </div>
                     <div class="layui-form-item">
                             <label class="layui-form-label">空投金额</label>
                             <div class="layui-input-block">
-                            <input type="password" name="password" required lay-verify="required" placeholder="请输入代币数量/每人" autocomplete="off" class="layui-input">
+                            <input type="text" id="value" name="password" required lay-verify="required" placeholder="请输入代币数量/每人" autocomplete="off" class="layui-input">
                             </div>
                         </div>
                     
                     <div class="layui-form-item layui-form-text">
                         <label class="layui-form-label">账户地址</label>
                         <div class="layui-input-block">
-                        <textarea name="desc" placeholder="请输入要发放空投的账户地址，用英文逗号隔开，每次最多输入100个" class="layui-textarea"></textarea>
+                        <textarea name="desc" id="users" placeholder="请输入要发放空投的账户地址，用英文逗号隔开，每次最多输入100个" class="layui-textarea"></textarea>
                         </div>
                     </div>
                     <div class="layui-form-item">
-                            <label class="layui-form-label">开关</label>
+                            <label class="layui-form-label">说明：</label>
                             <div class="layui-input-block">
-                            <input type="checkbox" name="switch" lay-skin="switch">
+                                <div class="layui-form-mid layui-word-aux">每次空投需支付0.1nas手续费</div>
                             </div>
-                            <div class="layui-form-mid layui-word-aux">辅助文字</div>
+                            
                     </div>
                     <div class="layui-form-item">
                         <div class="layui-input-block">
-                        <button class="layui-btn" lay-submit lay-filter="formDemo">立即提交</button>
-                        <button type="reset" class="layui-btn layui-btn-primary">重置</button>
+                        <button id="createButton" class="layui-btn" value=1 lay-submit lay-filter="formDemo" onclick="sunmit();">支付手续费</button>
+                        </div>
+                    </div>
+                </form>
+                <hr>
+                <form class="layui-form" action="">
+                    <div class="layui-form-item">
+                        <div class="layui-input-block">
+                            <p id="controlText" class="layui-form-mid layui-word-aux"></p>
                         </div>
                     </div>
                 </form>
@@ -105,5 +112,114 @@
 <script type="text/javascript" src="./javascript/jquery.min.js"></script>
 <script type="text/javascript" src="./layui/layui.js"></script>
 <script type="text/javascript" src="./javascript/sys_config.js"></script>
+<script src="lib/nebulas.js"></script>
+<script src="lib/nebPay.js"></script>
+<script>
+    'use strict';
+    var HttpRequest = require("nebulas").HttpRequest;
+    var Neb = require("nebulas").Neb;
+    var NebPay = require("nebpay");
+    var nebPay = new NebPay(); 
+    var Account = require("nebulas").Account;
+    var Transaction = require("nebulas").Transaction;
+    var account = new Account();
+    
+    var payAddress = 'n1FFDBHfMwY4io9FtSqcR3RL6T6FTkpN3eb';
+    var walletAddress = 'n21wgLzeXuBNSA1zE6haPrB3b83v1fw3NZa';
+    var intervalQuery;
+    
+    // 连接网络
+    var neb = new Neb();
+    var chainId = 1;
+    var netWork = "https://mainnet.nebulas.io"
+    //var chainId = 1001;
+    //var netWork = "https://testnet.nebulas.io"
+    neb.setRequest(new HttpRequest(netWork));
+
+    function sunmit() {
+        var but = document.getElementById("createButton");
+        if (but.value == 0){
+            payNAS()
+        } else {
+            airDrop()
+        }
+    }
+
+    function payNAS (){
+        var to = payAddress;
+        var value = 0;
+        var options = {
+            listener: function (resp) {
+                intervalQuery = setInterval(function() {
+                    payQuery(resp.txhash);
+                }, 5000);
+            }
+        }
+        //发送交易(发起智能合约调用)
+        nebPay.pay(to, value, options);
+        document.getElementById('controlText').innerText = "请在浏览器插件中，进行支付操作"
+    }
+
+    function payQuery(txhash) {
+        document.getElementById('controlText').innerText = "正在查询支付结果，请稍等。。。"
+        receiptTransaction(txhash).then(function(resp){
+            var respObject = resp;
+            if (respObject.status == 1){
+                clearInterval(intervalQuery);
+                document.getElementById("createButton").value = 1;
+                document.getElementById("createButton").innerText = "进行空投";
+                document.getElementById('controlText').innerText = `支付成功，您可以进行空投了，支付交易哈希为：${txhash}`
+            } else if (respObject.status == 0) {
+                clearInterval(intervalQuery);
+                alert(`支付失败`)
+                document.getElementById('controlText').innerText = `支付失败，请查看原因，交易哈希为：${txhash}`
+            }
+        })
+    }
+
+    function airDrop() {
+        var tokenAddress = document.getElementById("token").value.trim();
+        var userValue = document.getElementById("value").value.trim();
+        var users = document.getElementById("users").value.trim();
+        if (tokenAddress == "" || userValue == "" || users == "") {
+            alert("请输入必要参数！")
+        } else {
+            console.log(userList)
+            var userList = users.split(",")
+            var to = tokenAddress;
+            var value = 0;
+            var callFunction = "airDrop";
+            var callArgs =  JSON.stringify([userList, userValue]);      
+            var options = {
+                listener: function (resp) {
+                    intervalQuery = setInterval(function() {
+                        airDropQuery(resp.txhash);
+                    }, 5000);
+                }
+            }
+            //发送交易(发起智能合约调用)
+            nebPay.call(to, value, callFunction, callArgs, options);
+            document.getElementById('controlText').innerText = `请在进行空投，数据量较大，请耐心稍等。。。`
+        } 
+    }
+
+    function airDropQuery(txhash) {
+        document.getElementById('controlText').innerText = "正在查询空投结果，请稍等。。。"
+        receiptTransaction(txhash).then(function(resp){
+            var respObject = resp;
+            if (respObject.status == 1){
+                clearInterval(intervalQuery);
+                document.getElementById("createButton").value = 0;
+                document.getElementById("createButton").innerText = "支付手续费";
+                document.getElementById('controlText').innerText = `空投成功，交易哈希为：${txhash}`
+            } else if (respObject.status == 0) {
+                clearInterval(intervalQuery);
+                alert(`支付失败`)
+                document.getElementById('controlText').innerText = `空投失败，请查看原因，交易哈希为：${txhash}`
+            }
+        })
+    }
+        
+</script>
 </body>
 </html>
