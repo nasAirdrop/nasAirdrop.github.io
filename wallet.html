@@ -78,7 +78,7 @@
                   </div>
                   <div class="layui-inline" style="text-align:left;">
                     <div class="layui-input-inline">
-                      <button class="layui-btn">更换账户</button>
+                      <button class="layui-btn" onclick="changeAccount();">更换账户</button>
                     </div>
                   </div>
                 </div>
@@ -153,6 +153,8 @@
   var account = new Account();
       
   var walletAddress = 'n222oUdCCy4DtKXBnwUdKVKvqEzBqetn5q6';
+  var userAccount;
+  var tokenList = new Array();
   
   // 连接网络
   var neb = new Neb();
@@ -165,10 +167,80 @@
   function loadTokens() {
     getUserAddress().then(function(user){
       document.getElementById("account").value = user;
+      userAccount = user;
       console.log(user)
       searchToken(user);
     });
     
+  }
+
+  function changeAccount() {
+    var newUser = document.getElementById('account').value.trim();
+    if (!newUser) {
+      alert("请输入新账户地址！")
+    } else {
+      var repeat = 0;
+      for (var ua of tokenList){
+        if (ua == newUser){
+          repeat = 1;
+          alert("该代币已经在您的钱包中，请不要重复添加。")
+          break;
+        }
+      }
+      if (repeat == 0) {
+        searchToken(newUser);
+      }
+    }
+  }
+
+  function addToken() {
+    var tokenAddress = document.getElementById("token").trim();
+    if (tokenAddress == ""){
+      alert("请填写代币地址！")
+    } else if(tokenAddress == "") {
+      alert("您的钱包里已经有该代币了")
+    }else {
+      getToken(userAccount, tokenAddress).then(function(data) {
+        var to = walletAddress;   //Dapp的合约地址
+        var value = 0;
+        var callFunction = "save";//调用的函数名称
+        var callArgs =  JSON.stringify([tokenAddress, data.name, data.symbol]); //参数格式为参数数组的JSON字符串, 比如'["arg"]','["arg1","arg2]'        
+        var options = {
+        listener: function (resp) {
+          intervalQuery = setInterval(function() {
+            funcIntervalQuery2(resp.txhash);
+          }, 5000);
+        }
+        }
+        //发送交易(发起智能合约调用)
+        nebPay.call(to, value, callFunction, callArgs, options);
+      })
+    }
+    
+    
+    
+  }
+
+  function getToken(accountAddress, contractAddress) {
+    var promise = new Promise (function(resolve, reject) {
+      var name, symbol;
+      callContract(accountAddress, contractAddress, "name", []).then(function(data){
+        console.log(data)
+        if (data === null) {
+          console.log('收到一个null')
+          resolve(null)
+        } else {
+          name = data;
+          return callContract(accountAddress, contractAddress, "symbol", [])
+        }
+      }).then(function(data) {
+        symbol = data;
+        var dic = {name: name, symbol: symbol};
+        resolve(dic)
+      })
+      
+    });
+    return promise;
   }
 
   function searchToken(accountAddress) {
@@ -187,6 +259,7 @@
           if (token === null) {
             console.log('存在一个非法地址！')
           } else {
+            tokenList.push(token.address);
             var html = `
             <tr>
               <td>${token.symbol}</td>
@@ -234,14 +307,19 @@
       var contractAddress = token.address;
       var balance;
       callContract(accountAddress, contractAddress, "balanceOf", [accountAddress]).then(function(data) {
-        balance = data;
-        var dic = {
-          name: name, 
-          symbol: symbol, 
-          balance: balance, 
-          address: contractAddress
-        };
-        resolve(dic)
+        if (data === null) {
+          console.log('收到一个null')
+          resolve(null)
+        } else {
+          balance = data;
+          var dic = {
+            name: name, 
+            symbol: symbol, 
+            balance: balance, 
+            address: contractAddress
+          };
+          resolve(dic)
+        }
       });
     });
     return promise;

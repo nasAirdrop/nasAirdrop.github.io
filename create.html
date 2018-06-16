@@ -729,7 +729,7 @@
 			}
 			//发送交易(发起智能合约调用)
 			nebPay.call(to, value, callFunction, callArgs, options);
-			newWindow.innerHTML = `<h4>请再次到<em>浏览器插件</em>中完成操作...</h4>`
+			document.getElementById('controlText').innerText = `请在添加代币，请稍等。。。</h4>`
         }
 
         function funcIntervalQuery2(txhash) {
