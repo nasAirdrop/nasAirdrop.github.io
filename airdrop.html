@@ -199,12 +199,12 @@
             }
             //发送交易(发起智能合约调用)
             nebPay.call(to, value, callFunction, callArgs, options);
-            document.getElementById('controlText').innerText = `请在进行空投，数据量较大，请耐心稍等。。。`
+            document.getElementById('controlText').innerText = `请在浏览器插件中完成操作`
         } 
     }
 
     function airDropQuery(txhash) {
-        document.getElementById('controlText').innerText = "正在查询空投结果，请稍等。。。"
+        document.getElementById('controlText').innerText = "请在进行空投，数据量较大，请耐心稍等。。。"
         receiptTransaction(txhash).then(function(resp){
             var respObject = resp;
             if (respObject.status == 1){
