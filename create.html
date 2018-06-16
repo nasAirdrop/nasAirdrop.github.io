@@ -666,7 +666,8 @@
 						}
 					}
 					//发送交易(发起智能合约调用)
-					nebPay.deploy(to, source, "js", deployArgs, options)
+                    nebPay.deploy(to, source, "js", deployArgs, options)
+                    console.log(`正在创建代币，请稍等。。。`)
 					document.getElementById('controlText').innerText = `正在创建代币，请稍等。。。`
 				}
 			}
@@ -678,10 +679,11 @@
 			receiptTransaction(txhash).then(function(resp){
 				var respObject = resp;
 				if (respObject.status == 1){
+                    payed = 0;
                     var con_addr = respObject.contract_address;
                     clearInterval(intervalQuery);
                     tokenAddress = con_addr;
-                    document.getElementById("isAir").click();
+                    //document.getElementById("isAir").click();
                     document.getElementById('controlText').innerText = `代币创建成功，代币地址为：${con_addr}`
                     document.getElementById('addToken').style.display = 'inline';
 				} else if (respObject.status == 0) {
