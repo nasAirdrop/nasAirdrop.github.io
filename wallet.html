@@ -91,10 +91,37 @@
                   </tbody>
               </table>
               <hr>
-              <div id="noToken" style="text-align: center">
-                <p>正在从星云链加载您的代币钱包，请稍等。。。</p>
+              <div id="send" style="display:none">
+                <div class="layui-form-item" style="text-align:center">
+                    <p id="sendTitle"></p>
+                </div>
+                <div class="layui-form-item" style="text-align:center">
+                <div class="layui-inline">
+                  <div class="layui-input-inline" style="width: 400px">
+                    <input id="toAddress" autocomplete="off" class="layui-input" placeholder="请输入对方账户地址" type="text" >
+                  </div>
+                </div>
               </div>
-            </div>
+              <div class="layui-form-item" style="text-align:center">
+                  <div class="layui-inline">
+                    <div class="layui-input-inline" style="width: 400px">
+                      <input id="toValue" autocomplete="off" class="layui-input" placeholder="请输入转账代币数量" type="text">
+                    </div>
+                  </div>
+              </div> 
+              <div class="layui-form-item" style="text-align:center">
+                  <div class="layui-inline">
+                      <div class="layui-input-inline" style="width: 400px">
+                          <button id="sendBut" class="layui-btn" lay-submit lay-filter="formDemo" onclick="dealSend();", value="">确认转账</button>
+                      </div>
+                    </div>
+                  </div>
+              </div>
+              <hr>
+              <div id="noToken" style="text-align: center">
+                <p id="loadText">正在从星云链加载您的代币钱包，请稍等。。。</p>
+              </div>
+            </div>  
         </fieldset>
     </div>
   </div>
@@ -212,6 +239,63 @@
     })
       }
 
+  function sendToken(tokenAddress, sym, balance){
+    document.getElementById("table").style.display = 'none';
+    document.getElementById('send').style.display = 'inline';
+    document.getElementById('sendTitle').innerText= `正在进行代币转账:${sym}，请填写下列参数并确认转账：`
+    document.getElementById("sendBut").value = `${tokenAddress}-${balance}`;
+  }
+
+  function dealSend(){
+    var toAdd = document.getElementById("toAddress").value.trim();
+    var toVal = document.getElementById("toValue").value.trim();
+    var data = document.getElementById("sendBut").value.split('-');
+    var tokenAdd = data[0];
+    var balance = data[1];
+    console.log(data);
+    if (toAdd == "" || toVal == "") {
+      alert("请填写具体参数")
+    } else if(new Number(toVal) > new Number(balance)) {
+      alert("您没有这么多钱可以转账！");
+    } else if(!Account.isValidAddress(toAdd)){
+      alert("您输入的地址无效，请检查是否输入错误！");
+    } else {
+      var to = tokenAdd;
+      var value = 0;
+      var callFunction = "transfer";//调用的函数名称
+      var callArgs = JSON.stringify([toAdd, new Number(toVal)*1e18]);
+      var options = {
+        listener: function (resp) {
+          intervalQuery = setInterval(function() {
+            sendQuery(resp.txhash);
+          }, 5000);
+        }
+      }
+      //发送交易(发起智能合约调用)
+      nebPay.call(to, value, callFunction, callArgs, options);
+      document.getElementById('noToken').innerText = "请到浏览器插件中，完成转账操作。"
+      document.getElementById("noToken").style.display = 'inline';
+    }
+
+  }
+
+  function sendQuery(txhash){
+    document.getElementById("noToken").innerText = "正在查询转账结果，请稍等。。。"
+    receiptTransaction(txhash).then(function(resp){
+      var respObject = resp;
+      if (respObject.status == 1){
+                  clearInterval(intervalQuery);
+                  document.getElementById("noToken").innerText = `代币转账成功, 转账哈希：${txhash}`
+                  setTimeout('location.reload()', 5000)
+                  //location.reload();
+      } else if (respObject.status == 0) {
+        clearInterval(intervalQuery);
+                  alert(`代币转账失败`)
+                  document.getElementById("noToken").innerText = `转账失败，请查看原因，交易哈希为：${txhash}`
+      }
+    })
+  }
+  
   function delToken(id) {
       document.getElementById("noToken").innerText = "请到浏览器插件中完成操作"
       var to = walletAddress;   //Dapp的合约地址
@@ -297,6 +381,9 @@
               <td>${token.balance/1e18}</td>
               <td class="text-center">
                   <div class="layui-btn-group">
+                    <button class="layui-btn layui-btn-xs layui-btn-normal dw-dailog" onclick="sendToken('${token.address}', '${token.symbol}', '${token.balance/1e18}');">
+                      转账
+                    </button>
                     <button class="layui-btn layui-btn-xs layui-btn-danger dw-delete" onclick="delToken(${token.id});">
                       删除
                     </button>
